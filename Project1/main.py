@@ -16,7 +16,7 @@ def main():
         print('Enter the 3x3 puzzle:')
         for x in range(3):
             arr.append([int(y) for y in input().split()])
-        print('/nYour puzzle:')
+        print('\nYour puzzle:')
         printPuzzle(arr)
     elif userOpt == 2:         #preset puzzle
         arr = (['1', '0', '3'],
@@ -51,25 +51,51 @@ def getZero(node = []):
 		    if node[i][j] == 0:
 			    return i,j          #remember two returns, catch both.
 
-
-def algo(arr, choice):
-    expanded = 0        # expanded nodes
-    queue = 0           # queue
-    if choice == 1:     # Uniform Cost Search
-        node = Node(arr, 0, 0)
-    if choice == 2:     # A* Misplaced Tile heuristic
-        node = Node(arr, 0, 0)
-    if choice == 3:     # A* Manhattan Distance heuristic
-        node = Node(arr, 0, 0)
-
-
-def manhattanDistance(arr=[]):      #returns manhattance distance of 0
+#returns heuristic for A* Manh. Distance#
+def manhattanDistance(arr=[]):
     distance = 0
+    ROW = 0             #current row/col
+    COL = 0
+    goalROW = 0         #goalstate row/col
+    goalCOL = 0
+
+    for h in range(1,9):            #go thru whole puzzle
+        for i in range(3):
+            for j in range(3):          #check if not at 0 and not at goal state
+                if goal_state[i][j] == h:       #get coordinates goal state
+                    goalROW = i
+                    goalCOL = j
+                if arr[i][j] == h:              #get arr coordinates
+                    ROW = i
+                    COL = j
+            distance += abs(goalROW-ROW) + abs(goalCOL-COL)
+    return distance             
+
+#returns heuristic for A* Misplaced Tile#
+def misplacedAStar(arr=[]):
+    misplacedTiles = 0
     for i in range(3):
         for j in range(3):          #check if not at 0 and not at goal state
             if arr[i][j] != 0 and arr[i][j] != goal_state[i][j]:
-                distance += 1
-    return distance
+                misplacedTiles += 1
+    return misplacedTiles        
+
+#algorithm method#
+def algo(arr, choice):
+    heuristic = 0       #init heauristic
+    expanded = 0        # expanded nodes
+    queue = 0           # queue
+    #figure out heauristics. 
+    if choice == 1:     # Uniform Cost Search
+        heuristic = 0
+    if choice == 2:     # A* Misplaced Tile heuristic
+        heuristic = misplacedAStar(arr) 
+    if choice == 3:     # A* Manhattan Distance heuristic
+        heuristic = manhattanDistance(arr) 
+
+    node = Node(arr, heuristic, 0)      #initialize node
+    print(heuristic)
+     
 
 ####### Node Class ########
 class Node:
@@ -79,5 +105,6 @@ class Node:
         self.depth = depth              # depth for calc
         self.cost = heuristic + depth   # for decision making
 
+#MAIN DRIVER#
 if __name__ == "__main__":
     main()
