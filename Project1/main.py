@@ -1,8 +1,6 @@
 import copy
 
-goal_state = [[1,2,3], # setting our goal/finished state 
-			  [4,5,6],
-			  [7,8,0]]
+goal_state = [[1,2,3],[4,5,6],[7,8,0]]  # setting our goal/finished state
 
 def main():
     print('Project 1: CS170 8 Puzzle - Brayan Montiel\n')
@@ -13,28 +11,26 @@ def main():
                     'Enter choice: ')
     userOpt = int(userOpt)
     arr = []
-    if userOpt == 1:  # custom puzzle
+    if userOpt == 1:        #custom puzzle
         print('Lets create your puzzle. Enter one 0 for missing piece. (Program assumes no incorrect input)\n')
-        #size = int(input()) 
         print('Enter the 3x3 puzzle:')
         for x in range(3):
             arr.append([int(y) for y in input().split()])
         print('/nYour puzzle:')
         printPuzzle(arr)
-    elif userOpt == 2:  # preset puzzle
+    elif userOpt == 2:         #preset puzzle
         arr = (['1', '0', '3'],
                ['4', '2', '6'],
                ['7', '5', '8'])
         printPuzzle(arr)
     #choose which algorithm
-    userOpt = input('\nChoose an algorithm to solve puzzle: \n'
+    algoPick = input('\nChoose an algorithm to solve puzzle: \n'
                     '1) Uniform Cost Search \n'
                     '2) A* with the Misplaced Tile heuristic. \n'
                     '3) A* with the Manhattan Distance heuristic. \n'
                     'Enter choice: ')
-    userOpt = int(userOpt)
-    #print(algo(arr, userOpt))
-    #if goalCheck(arr) == True: //used to see if goalCheck works
+    algoPick = int(algoPick)
+    algo(arr,algoPick)          #pass in to algo method
 
 #formats the array nicely#
 def printPuzzle(arr = []): 
@@ -47,6 +43,41 @@ def goalCheck(arr):
         return True
     else:
         return False
+
+#Returns the ROW/COL of zero in the puzzle#
+def getZero(node = []):
+    for i in range(3):
+	    for j in range(3):
+		    if node[i][j] == 0:
+			    return i,j          #remember two returns, catch both.
+
+
+def algo(arr, choice):
+    expanded = 0        # expanded nodes
+    queue = 0           # queue
+    if choice == 1:     # Uniform Cost Search
+        node = Node(arr, 0, 0)
+    if choice == 2:     # A* Misplaced Tile heuristic
+        node = Node(arr, 0, 0)
+    if choice == 3:     # A* Manhattan Distance heuristic
+        node = Node(arr, 0, 0)
+
+
+def manhattanDistance(arr=[]):      #returns manhattance distance of 0
+    distance = 0
+    for i in range(3):
+        for j in range(3):          #check if not at 0 and not at goal state
+            if arr[i][j] != 0 and arr[i][j] != goal_state[i][j]:
+                distance += 1
+    return distance
+
+####### Node Class ########
+class Node:
+    def __init__(self, arr, heuristic, depth):
+        self.currState = arr            # basically points to array
+        self.heuristic = heuristic      # will need for A*
+        self.depth = depth              # depth for calc
+        self.cost = heuristic + depth   # for decision making
 
 if __name__ == "__main__":
     main()
