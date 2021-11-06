@@ -1,4 +1,5 @@
 import copy
+import time
 from functools import total_ordering
 import heapq 
 
@@ -20,10 +21,9 @@ def menu():
             arr.append([int(y) for y in input().split()])
         print('\nYour puzzle:')
         printArray(arr)
-    elif userOpt == 2:              #preset puzzle
-        arr = (['1', '0', '3'],
-               ['4', '2', '6'],
-               ['7', '5', '8'])
+    elif userOpt == 2:                          #preset puzzle
+        arr = [[0, 1, 2],[4, 5, 3],[7, 8, 6]]   #do-able example from pdf
+        print('\nYour puzzle:')
         printArray(arr)
     #choose which algorithm
     algoPick = input('\nChoose an algorithm to solve puzzle: \n'
@@ -35,7 +35,7 @@ def menu():
     generalSearch(arr,algoPick)     #pass in to algo method
 
 #formats the array nicely#
-def printArray(arr = []): 
+def printArray(arr = []):       #https://stackoverflow.com/questions/17870612/printing-a-two-dimensional-array-in-python#
     print('\n'.join([''.join(['{:3}'.format(item) for item in row]) 
       for row in arr]))
 
@@ -128,8 +128,14 @@ def updateQueue(choice, working_nodes =[], working_q =[]):
             working_nodes[i].cost = working_nodes[i].heuristic + working_nodes[i].depth
         
         #update working queue
-        #working_q.append(working_nodes[i])
         heapq.heappush(working_q, working_nodes[i])
+
+#Timeout method#
+def timeout(timerStart):
+    if time.time()-timerStart >= 900:
+        return False    #out of time
+    else:
+        return True     #continue
 
 #General-Search method#
 def generalSearch(arr, choice):
@@ -138,6 +144,7 @@ def generalSearch(arr, choice):
     maximum_q = 0    
     working_q =[]           #init queue
     working_nodes =[]       #tracking expanded nodes
+    timerStart = time.time()    #kick off timer
 
     #figure out heauristics. 
     if choice == 1:     # Uniform Cost Search - hard coded to 0
@@ -148,30 +155,27 @@ def generalSearch(arr, choice):
         heuristic = manhattanDistance(arr) 
 
     node = Node(arr, heuristic, 0)      #initialize node
-    #working_q.append(node)
     heapq.heappush(working_q, node)
 
-    continueSearch = True                   #will be while loop variable
-    while continueSearch:
+    continueSearch = True           #will be while loop variable
+    timeCheck = True                #checks CPU time is not greater than 15 min
+    while continueSearch and timeCheck:
         #Base case - no solution - FAILURE
         if len(working_q) == 0:                
             print('Algorithm could not solve puzzle. Please try again.')
             continueSearch = False 
         
-        #sort queue by herusitc/depth if Misplaced Tile or Manhattan Distance
-        #if choice == 2 or choice ==3: 
-        #    working_q = sorted(working_q, key = lambda node: (node.cost))
-
         heapq.heapify(working_q)
         currNode = heapq.heappop(working_q)
-        #currNode = working_q.pop(0)             #remove front node
         
         if currNode.currState == goal_state:    #goal test
+            stopTime = time.time() - timerStart
             print('\n\nPUZZLE SOLVED!')
             printArray(currNode.currState)
             print('\nSolution depth was: ', currNode.depth)
             print('Number of nodes expanded: ', expanded_nodes)
             print('Max queue size: ', maximum_q)
+            print('CPU Time: ', stopTime, ' seconds')
             continueSearch = False
 
         #continue search
@@ -208,7 +212,7 @@ def generalSearch(arr, choice):
 
             #continue loop
             continueSearch = True
-
+        
 
 ####### Node Class ########
 class Node:
