@@ -80,22 +80,61 @@ def misplacedTiles(arr=[]):
                 misplacedTiles += 1
     return misplacedTiles       
 
-#Move 0 Up#
-def up(rowZero, colZero, depth, arr = []):
-    temp = copy.deepcopy(arr)
-    temp[rowZero][colZero] = temp[rowZero-1][colZero]
+#Move 0 up#
+def up(rowZero, colZero, depth, arr = [], working_nodes = []):
+    temp = copy.deepcopy(arr)                           #copy of current node
+    temp[rowZero][colZero] = temp[rowZero-1][colZero]   #swap the zero up in puzzle
     temp[rowZero-1][colZero] = 0
-    newNode = Node(temp,0,depth)
+    newNode = Node(temp,0,depth)            #update new node 
+    working_nodes.append(newNode)           #add to node list
 
-    
+#Move 0 down#
+def down(rowZero, colZero, depth, arr = [], working_nodes = []):
+    temp = copy.deepcopy(arr)                           #copy of current node
+    temp[rowZero][colZero] = temp[rowZero+1][colZero]   #swap the zero down in puzzle
+    temp[rowZero+1][colZero] = 0
+    newNode = Node(temp,0,depth)            #update new node 
+    working_nodes.append(newNode)           #add to node list
 
+#Move 0 right#
+def right(rowZero, colZero, depth, arr = [], working_nodes = []):
+    temp = copy.deepcopy(arr)                           #copy of current node
+    temp[rowZero][colZero] = temp[rowZero][colZero+1]   #swap the zero right in puzzle
+    temp[rowZero][colZero+1] = 0
+    newNode = Node(temp,0,depth)            #update new node 
+    working_nodes.append(newNode)           #add to node list
+
+#Move 0 left#
+def left(rowZero, colZero, depth, arr = [], working_nodes = []):
+    temp = copy.deepcopy(arr)                           #copy of current node
+    temp[rowZero][colZero] = temp[rowZero][colZero-1]   #swap the zero left in puzzle
+    temp[rowZero][colZero-1] = 0
+    newNode = Node(temp,0,depth)            #update new node 
+    working_nodes.append(newNode)           #add to node list
+
+def updateQueue(choice, working_nodes =[], working_q =[]):
+    #loop through list to update cost of node in list
+    for i in range(len(working_nodes)):
+        if choice == 2:         #update cost for Misplaced Tile Search
+            heuristic = misplacedTiles(working_nodes[i].currState)
+            working_nodes[i].heuristic = heuristic
+            working_nodes[i].cost = working_nodes[i].heuristic + working_nodes[i].depth
+
+        elif choice == 3:         #update cost for Manhattan Search
+            heuristic = misplacedTiles(working_nodes[i].currState)
+            working_nodes[i].heuristic = heuristic
+            working_nodes[i].cost = working_nodes[i].heuristic + working_nodes[i].depth
+        
+        #update working queue
+        working_q.append[working_nodes[i]]
 
 #General-Search method#
 def generalSearch(arr, choice):
     heuristic = 0           #init heuristic, max queue, and expanded nodes
     expanded_nodes = 0
     maximum_q = 0    
-    working_q =[]          #init queue
+    working_q =[]           #init queue
+    working_nodes =[]       #tracking expanded nodes
 
     #figure out heauristics. 
     if choice == 1:     # Uniform Cost Search
@@ -130,20 +169,33 @@ def generalSearch(arr, choice):
             #print current node state being expanded
             print('The best state to expand with a g(n) = ', currNode.depth, 'and h(n) = ', currNode.heuristic, ' :')
             printArray(currNode.currState)
-            depth = currNode.depth + 1              #depth of current node
-            rowZero,colZero = getZero(currNode)     #returns position of 0 in array   
+            depth = currNode.depth + 1                        #add to depth
+            rowZero,colZero = getZero(currNode.currState)     #returns both row,col of 0 in array   
             
-            if rowZero != 0:
+            #check for position to swap
+            if rowZero != 0:   #up
                 expanded_nodes += 1
-            
-            if rowZero != 2:
+                up(rowZero, colZero, depth, currNode.currState, working_nodes)
+
+            if rowZero != 2:   #down
                 expanded_nodes += 1
-            
-            if colZero != 0:
+                down(rowZero, colZero, depth, currNode.currState, working_nodes)
+
+            if colZero != 0:   #left
                 expanded_nodes += 1
-            
-            if colZero != 2:
+                left(rowZero, colZero, depth, currNode.currState, working_nodes)
+
+            if colZero != 2:   #right
                 expanded_nodes += 1
+                right(rowZero, colZero, depth, currNode.currState, working_nodes)
+
+            updateQueue(choice, working_nodes, working_q)
+            #update max queue size
+            if maximum_q <= len(working_q):
+                maximum_q = len(working_q)
+            #continue loop
+            continueSearch = True
+
 
 ####### Node Class ########
 class Node:
