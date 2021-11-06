@@ -17,12 +17,12 @@ def main():
         for x in range(3):
             arr.append([int(y) for y in input().split()])
         print('\nYour puzzle:')
-        printPuzzle(arr)
-    elif userOpt == 2:         #preset puzzle
+        printArray(arr)
+    elif userOpt == 2:              #preset puzzle
         arr = (['1', '0', '3'],
                ['4', '2', '6'],
                ['7', '5', '8'])
-        printPuzzle(arr)
+        printArray(arr)
     #choose which algorithm
     algoPick = input('\nChoose an algorithm to solve puzzle: \n'
                     '1) Uniform Cost Search \n'
@@ -30,10 +30,10 @@ def main():
                     '3) A* with the Manhattan Distance heuristic. \n'
                     'Enter choice: ')
     algoPick = int(algoPick)
-    algo(arr,algoPick)          #pass in to algo method
+    generalSearch(arr,algoPick)     #pass in to algo method
 
 #formats the array nicely#
-def printPuzzle(arr = []): 
+def printArray(arr = []): 
     print('\n'.join([''.join(['{:3}'.format(item) for item in row]) 
       for row in arr]))
 
@@ -72,7 +72,7 @@ def manhattanDistance(arr=[]):
     return distance             
 
 #returns heuristic for A* Misplaced Tile#
-def misplacedAStar(arr=[]):
+def misplacedTiles(arr=[]):
     misplacedTiles = 0
     for i in range(3):
         for j in range(3):          #check if not at 0 and not at goal state
@@ -81,21 +81,39 @@ def misplacedAStar(arr=[]):
     return misplacedTiles        
 
 #algorithm method#
-def algo(arr, choice):
-    heuristic = 0       #init heauristic
-    expanded = 0        # expanded nodes
-    queue = 0           # queue
+def generalSearch(arr, choice):
+    heuristic, expanded_nodes, maximum_q = 0    # queue
+    priority_q =[]                              #init priority queue
+
     #figure out heauristics. 
     if choice == 1:     # Uniform Cost Search
         heuristic = 0
     if choice == 2:     # A* Misplaced Tile heuristic
-        heuristic = misplacedAStar(arr) 
+        heuristic = misplacedTiles(arr) 
     if choice == 3:     # A* Manhattan Distance heuristic
         heuristic = manhattanDistance(arr) 
 
     node = Node(arr, heuristic, 0)      #initialize node
-    print(heuristic)
-     
+    priority_q.append(node)
+
+    continueSearch = True                   #will be while loop variable
+    while continueSearch:
+        currNode = priority_q.pop(0)        #get next node from priority_q
+        #BASE CASES
+        if len(priority_q) == 0:                # no solution found
+            print('Algorithm could not solve puzzle. Please try again.')
+            continueSearch = False 
+
+        elif currNode.currState == goal_state:    # solution found
+            printArray(currNode.currState)
+            print('Solution depth was: ' + currNode.depth)
+            print('Number of nodes expanded: ' + expanded_nodes)
+            print('Max queue size: ' + maximum_q)
+        #CONTINUE SEARCH
+        else:
+            print('Testing progress.')
+
+
 
 ####### Node Class ########
 class Node:
@@ -103,8 +121,8 @@ class Node:
         self.currState = arr            # basically points to array
         self.heuristic = heuristic      # will need for A*
         self.depth = depth              # depth for calc
-        self.cost = heuristic + depth   # for decision making
-
+        self.cost = heuristic + depth   # cost = depth g(n) + heuristic h(n)
+    
 #MAIN DRIVER#
 if __name__ == "__main__":
     main()
