@@ -1,5 +1,6 @@
 import copy
-from heapq import heappush, heappop, heapify
+from functools import total_ordering
+import heapq 
 
 goal_state = [[1,2,3],[4,5,6],[7,8,0]]  # setting our goal/finished state
 
@@ -127,7 +128,8 @@ def updateQueue(choice, working_nodes =[], working_q =[]):
             working_nodes[i].cost = working_nodes[i].heuristic + working_nodes[i].depth
         
         #update working queue
-        working_q.append(working_nodes[i])
+        #working_q.append(working_nodes[i])
+        heapq.heappush(working_q, working_nodes[i])
 
 #General-Search method#
 def generalSearch(arr, choice):
@@ -146,7 +148,8 @@ def generalSearch(arr, choice):
         heuristic = manhattanDistance(arr) 
 
     node = Node(arr, heuristic, 0)      #initialize node
-    working_q.append(node)
+    #working_q.append(node)
+    heapq.heappush(working_q, node)
 
     continueSearch = True                   #will be while loop variable
     while continueSearch:
@@ -156,10 +159,12 @@ def generalSearch(arr, choice):
             continueSearch = False 
         
         #sort queue by herusitc/depth if Misplaced Tile or Manhattan Distance
-        if choice == 2 or choice ==3: 
-            working_q = sorted(working_q, key = lambda node: (node.heuristic, node.depth))
+        #if choice == 2 or choice ==3: 
+        #    working_q = sorted(working_q, key = lambda node: (node.cost))
 
-        currNode = working_q.pop(0)             #remove front node
+        heapq.heapify(working_q)
+        currNode = heapq.heappop(working_q)
+        #currNode = working_q.pop(0)             #remove front node
         
         if currNode.currState == goal_state:    #goal test
             print('\n\nPUZZLE SOLVED!')
@@ -212,6 +217,25 @@ class Node:
         self.heuristic = heuristic      # will need for A*
         self.depth = depth              # depth for calc
         self.cost = heuristic + depth   # cost = depth g(n) + heuristic h(n)
+    
+    #need to import these functions in order for heapq to work
+    def __eq__(self, other):
+        return ((self.cost) == (other.cost))
+
+    def __ne__(self, other):
+        return ((self.cost) != (other.cost))
+
+    def __lt__(self, other):
+        return ((self.cost) < (other.cost))
+
+    def __le__(self, other):
+        return ((self.cost) <= (other.cost))
+
+    def __gt__(self, other):
+        return ((self.cost) > (other.cost))
+
+    def __ge__(self, other):
+        return ((self.cost) >= (other.cost))
     
 #MAIN DRIVER#
 if __name__ == "__main__":
