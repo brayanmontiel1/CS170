@@ -2,7 +2,7 @@ import copy
 
 goal_state = [[1,2,3],[4,5,6],[7,8,0]]  # setting our goal/finished state
 
-def main():
+def menu():
     print('Project 1: CS170 8 Puzzle - Brayan Montiel\n')
     print('Please choose an option below: ')
     # cin which option user wants to choose.
@@ -13,7 +13,7 @@ def main():
     arr = []
     if userOpt == 1:        #custom puzzle
         print('Lets create your puzzle. Enter one 0 for missing piece. (Program assumes no incorrect input)\n')
-        print('Enter the 3x3 puzzle:')
+        print('Enter the 3x3 puzzle: [example:1 2 3(enter)..etc')
         for x in range(3):
             arr.append([int(y) for y in input().split()])
         print('\nYour puzzle:')
@@ -45,10 +45,10 @@ def goalCheck(arr):
         return False
 
 #Returns the ROW/COL of zero in the puzzle#
-def getZero(node = []):
+def getZero(arr = []):
     for i in range(3):
 	    for j in range(3):
-		    if node[i][j] == 0:
+		    if arr[i][j] == 0:
 			    return i,j          #remember two returns, catch both.
 
 #returns heuristic for A* Manh. Distance#
@@ -78,12 +78,24 @@ def misplacedTiles(arr=[]):
         for j in range(3):          #check if not at 0 and not at goal state
             if arr[i][j] != 0 and arr[i][j] != goal_state[i][j]:
                 misplacedTiles += 1
-    return misplacedTiles        
+    return misplacedTiles       
 
-#algorithm method#
+#Move 0 Up#
+def up(rowZero, colZero, depth, arr = []):
+    temp = copy.deepcopy(arr)
+    temp[rowZero][colZero] = temp[rowZero-1][colZero]
+    temp[rowZero-1][colZero] = 0
+    newNode = Node(temp,0,depth)
+
+    
+
+
+#General-Search method#
 def generalSearch(arr, choice):
-    heuristic, expanded_nodes, maximum_q = 0    # queue
-    priority_q =[]                              #init priority queue
+    heuristic = 0           #init heuristic, max queue, and expanded nodes
+    expanded_nodes = 0
+    maximum_q = 0    
+    working_q =[]          #init queue
 
     #figure out heauristics. 
     if choice == 1:     # Uniform Cost Search
@@ -94,26 +106,44 @@ def generalSearch(arr, choice):
         heuristic = manhattanDistance(arr) 
 
     node = Node(arr, heuristic, 0)      #initialize node
-    priority_q.append(node)
+    working_q.append(node)
 
     continueSearch = True                   #will be while loop variable
     while continueSearch:
-        currNode = priority_q.pop(0)        #get next node from priority_q
-        #BASE CASES
-        if len(priority_q) == 0:                # no solution found
+        #Base case - no solution
+        if len(working_q) == 0:                
             print('Algorithm could not solve puzzle. Please try again.')
             continueSearch = False 
 
-        elif currNode.currState == goal_state:    # solution found
+        currNode = working_q.pop(0)        #get next node from priority_q
+        
+        #Check if goal state found
+        if currNode.currState == goal_state:    
+            print('\n\nPUZZLE SOLVED!')
             printArray(currNode.currState)
-            print('Solution depth was: ' + currNode.depth)
-            print('Number of nodes expanded: ' + expanded_nodes)
-            print('Max queue size: ' + maximum_q)
-        #CONTINUE SEARCH
+            print('\nSolution depth was: ', currNode.depth)
+            print('Number of nodes expanded: ', expanded_nodes)
+            print('Max queue size: ', maximum_q)
+            continueSearch = False
+        #continue search
         else:
-            print('Testing progress.')
-
-
+            #print current node state being expanded
+            print('The best state to expand with a g(n) = ', currNode.depth, 'and h(n) = ', currNode.heuristic, ' :')
+            printArray(currNode.currState)
+            depth = currNode.depth + 1              #depth of current node
+            rowZero,colZero = getZero(currNode)     #returns position of 0 in array   
+            
+            if rowZero != 0:
+                expanded_nodes += 1
+            
+            if rowZero != 2:
+                expanded_nodes += 1
+            
+            if colZero != 0:
+                expanded_nodes += 1
+            
+            if colZero != 2:
+                expanded_nodes += 1
 
 ####### Node Class ########
 class Node:
@@ -125,4 +155,4 @@ class Node:
     
 #MAIN DRIVER#
 if __name__ == "__main__":
-    main()
+    menu()
