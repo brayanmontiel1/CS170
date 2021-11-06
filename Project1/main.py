@@ -1,4 +1,5 @@
 import copy
+from heapq import heappush, heappop, heapify
 
 goal_state = [[1,2,3],[4,5,6],[7,8,0]]  # setting our goal/finished state
 
@@ -126,7 +127,7 @@ def updateQueue(choice, working_nodes =[], working_q =[]):
             working_nodes[i].cost = working_nodes[i].heuristic + working_nodes[i].depth
         
         #update working queue
-        working_q.append[working_nodes[i]]
+        working_q.append(working_nodes[i])
 
 #General-Search method#
 def generalSearch(arr, choice):
@@ -137,7 +138,7 @@ def generalSearch(arr, choice):
     working_nodes =[]       #tracking expanded nodes
 
     #figure out heauristics. 
-    if choice == 1:     # Uniform Cost Search
+    if choice == 1:     # Uniform Cost Search - hard coded to 0
         heuristic = 0
     if choice == 2:     # A* Misplaced Tile heuristic
         heuristic = misplacedTiles(arr) 
@@ -149,21 +150,25 @@ def generalSearch(arr, choice):
 
     continueSearch = True                   #will be while loop variable
     while continueSearch:
-        #Base case - no solution
+        #Base case - no solution - FAILURE
         if len(working_q) == 0:                
             print('Algorithm could not solve puzzle. Please try again.')
             continueSearch = False 
-
-        currNode = working_q.pop(0)        #get next node from priority_q
         
-        #Check if goal state found
-        if currNode.currState == goal_state:    
+        #sort queue by herusitc/depth if Misplaced Tile or Manhattan Distance
+        if choice == 2 or choice ==3: 
+            working_q = sorted(working_q, key = lambda node: (node.heuristic, node.depth))
+
+        currNode = working_q.pop(0)             #remove front node
+        
+        if currNode.currState == goal_state:    #goal test
             print('\n\nPUZZLE SOLVED!')
             printArray(currNode.currState)
             print('\nSolution depth was: ', currNode.depth)
             print('Number of nodes expanded: ', expanded_nodes)
             print('Max queue size: ', maximum_q)
             continueSearch = False
+
         #continue search
         else:
             #print current node state being expanded
@@ -189,10 +194,13 @@ def generalSearch(arr, choice):
                 expanded_nodes += 1
                 right(rowZero, colZero, depth, currNode.currState, working_nodes)
 
+            #add new nodes to the queue 
             updateQueue(choice, working_nodes, working_q)
+
             #update max queue size
             if maximum_q <= len(working_q):
                 maximum_q = len(working_q)
+
             #continue loop
             continueSearch = True
 
