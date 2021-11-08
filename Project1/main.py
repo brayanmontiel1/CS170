@@ -260,7 +260,7 @@ class Node:
     
     #need to import these functions in order for heapq to work
     def __eq__(self, other):
-        #return ((self.cost) == (other.cost)) won't return accurate depth if equal, so return depth
+        #won't return accurate depth if equal, so return depth
         return (self.depth)
 
     def __ne__(self, other):
