@@ -83,52 +83,69 @@ def misplacedTiles(arr=[]):
     return misplacedTiles       
 
 #Move 0 up#
-def up(rowZero, colZero, depth, arr = [], working_nodes = []):
+def up(rowZero, colZero, depth, arr = [], cost = [], visited = []):
     temp = copy.deepcopy(arr)                           #copy of current node
-    temp[rowZero][colZero] = temp[rowZero-1][colZero]   #swap the zero up in puzzle
-    temp[rowZero-1][colZero] = 0
-    newNode = Node(temp,0,depth)            #update new node 
-    working_nodes.append(newNode)           #add to node list
+    up = temp[rowZero][colZero]   #swap the zero up in puzzle
+    temp[rowZero][colZero] = temp[rowZero-1][colZero]
+    temp[rowZero-1][colZero] = up
+
+    if temp not in visited:
+        newNode = Node(temp,0,depth)            #update new node 
+        cost.append(newNode)           #add to node list
 
 #Move 0 down#
-def down(rowZero, colZero, depth, arr = [], working_nodes = []):
+def down(rowZero, colZero, depth, arr = [], cost = [], visited = []):
     temp = copy.deepcopy(arr)                           #copy of current node
-    temp[rowZero][colZero] = temp[rowZero+1][colZero]   #swap the zero down in puzzle
-    temp[rowZero+1][colZero] = 0
-    newNode = Node(temp,0,depth)            #update new node 
-    working_nodes.append(newNode)           #add to node list
+    down = temp[rowZero][colZero]   #swap the zero up in puzzle
+    temp[rowZero][colZero] = temp[rowZero+1][colZero]
+    temp[rowZero+1][colZero] = down
+
+    if temp not in visited:
+        newNode = Node(temp,0,depth)            #update new node 
+        cost.append(newNode)           #add to node list
 
 #Move 0 right#
-def right(rowZero, colZero, depth, arr = [], working_nodes = []):
+def right(rowZero, colZero, depth, arr = [], cost = [], visited = []):
     temp = copy.deepcopy(arr)                           #copy of current node
-    temp[rowZero][colZero] = temp[rowZero][colZero+1]   #swap the zero right in puzzle
-    temp[rowZero][colZero+1] = 0
-    newNode = Node(temp,0,depth)            #update new node 
-    working_nodes.append(newNode)           #add to node list
+    down = temp[rowZero][colZero]   #swap the zero up in puzzle
+    temp[rowZero][colZero] = temp[rowZero][colZero+1]
+    temp[rowZero][colZero+1] = down
+
+    if temp not in visited:
+        newNode = Node(temp,0,depth)            #update new node 
+        cost.append(newNode)           #add to node list
+
 
 #Move 0 left#
-def left(rowZero, colZero, depth, arr = [], working_nodes = []):
+def left(rowZero, colZero, depth, arr = [], cost = [], visited = []):
     temp = copy.deepcopy(arr)                           #copy of current node
-    temp[rowZero][colZero] = temp[rowZero][colZero-1]   #swap the zero left in puzzle
-    temp[rowZero][colZero-1] = 0
-    newNode = Node(temp,0,depth)            #update new node 
-    working_nodes.append(newNode)           #add to node list
+    down = temp[rowZero][colZero]   #swap the zero up in puzzle
+    temp[rowZero][colZero] = temp[rowZero][colZero-1]
+    temp[rowZero][colZero-1] = down
 
-def updateQueue(choice, working_nodes =[], working_q =[]):
+    if temp not in visited:
+        newNode = Node(temp,0,depth)            #update new node 
+        cost.append(newNode)                    #add to node list
+
+
+def updateQueue(choice, currNode, working_q =[], visited = [], cost = []):
     #loop through list to update cost of node in list
-    for i in range(len(working_nodes)):
+    for i in range(len(cost)):
+        if choice == 1:         #update 
+            cost[i].depth = currNode.depth+1
+            
         if choice == 2:         #update cost for Misplaced Tile Search
-            heuristic = misplacedTiles(working_nodes[i].currState)
-            working_nodes[i].heuristic = heuristic
-            working_nodes[i].cost = working_nodes[i].heuristic + working_nodes[i].depth
+            cost[i].heuristic = misplacedTiles(cost[i].currState)
+            cost[i].depth = currNode.depth+1
 
         elif choice == 3:         #update cost for Manhattan Search
-            heuristic = misplacedTiles(working_nodes[i].currState)
-            working_nodes[i].heuristic = heuristic
-            working_nodes[i].cost = working_nodes[i].heuristic + working_nodes[i].depth
+            cost[i].heuristic = manhattanDistance(cost[i].currState)
+            cost[i].depth = currNode.depth+1
+
+        heapq.heappush(working_q, cost[i])         #update working queue
+        visited.append(cost[i].currState)                 #add nodes to visited  
         
-        #update working queue
-        heapq.heappush(working_q, working_nodes[i])
+        
 
 #Timeout method#
 def timeout(timerStart):
@@ -143,9 +160,9 @@ def generalSearch(arr, choice):
     expanded_nodes = 0
     maximum_q = 0    
     working_q =[]           #init queue
-    working_nodes =[]       #tracking expanded nodes
+    visited = []           #tracking already visited nodes
     timerStart = time.time()    #kick off timer
-
+    
     #figure out heauristics. 
     if choice == 1:     # Uniform Cost Search - hard coded to 0
         heuristic = 0
@@ -156,16 +173,19 @@ def generalSearch(arr, choice):
 
     node = Node(arr, heuristic, 0)      #initialize node
     heapq.heappush(working_q, node)
+    visited.append(node.currState)      #add node to visited
 
     continueSearch = True           #will be while loop variable
     timeCheck = True                #checks CPU time is not greater than 15 min
-    while continueSearch and timeCheck:
+    while continueSearch :
         #Base case - no solution - FAILURE
         if len(working_q) == 0:                
             print('Algorithm could not solve puzzle. Please try again.')
             continueSearch = False 
         
-        heapq.heapify(working_q)
+        if choice == 2 or choice ==3:           #sort list for A* only 
+            heapq.heapify(working_q)
+
         currNode = heapq.heappop(working_q)
         
         if currNode.currState == goal_state:    #goal test
@@ -183,28 +203,29 @@ def generalSearch(arr, choice):
             #print current node state being expanded
             print('The best state to expand with a g(n) = ', currNode.depth, 'and h(n) = ', currNode.heuristic, ' :')
             printArray(currNode.currState)
-            depth = currNode.depth + 1                        #add to depth
-            rowZero,colZero = getZero(currNode.currState)     #returns both row,col of 0 in array   
-            
+            depth = currNode.depth                              #add to depth
+            rowZero,colZero = getZero(currNode.currState)       #returns both row,col of 0 in array   
+            cost = []
+
             #check for position to swap
             if rowZero != 0:   #up
                 expanded_nodes += 1
-                up(rowZero, colZero, depth, currNode.currState, working_nodes)
+                up(rowZero, colZero, depth, currNode.currState, cost, visited)
 
             if rowZero != 2:   #down
                 expanded_nodes += 1
-                down(rowZero, colZero, depth, currNode.currState, working_nodes)
+                down(rowZero, colZero, depth, currNode.currState, cost, visited)
 
             if colZero != 0:   #left
                 expanded_nodes += 1
-                left(rowZero, colZero, depth, currNode.currState, working_nodes)
+                left(rowZero, colZero, depth, currNode.currState, cost, visited)
 
             if colZero != 2:   #right
                 expanded_nodes += 1
-                right(rowZero, colZero, depth, currNode.currState, working_nodes)
-
+                right(rowZero, colZero, depth, currNode.currState, cost, visited)
+     
             #add new nodes to the queue 
-            updateQueue(choice, working_nodes, working_q)
+            updateQueue(choice,currNode, working_q, visited, cost)
 
             #update max queue size
             if maximum_q <= len(working_q):
