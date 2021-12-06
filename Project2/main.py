@@ -1,26 +1,39 @@
 import copy
 import time
+import csv
 
 def menu():
     print('Project 2: CS170 Feature Classification - Brayan Montiel\n')
-    fileSmall = ''
-    fileLarge = ''
-    # cin which option user wants to choose.
-    
-    #choose which algorithm
-    algoPick = input('\nChoose an algorithm to solve puzzle: \n'
-                    '1) Uniform Cost Search \n'
-                    '2) A* with the Misplaced Tile heuristic. \n'
-                    '3) A* with the Manhattan Distance heuristic. \n'
-                    'Enter choice: ')
-    algoPick = int(algoPick)
+    #test data - change when testing assigned small-19 and large-13: 
+    testSmall = 'CS170/Project2/testdata/Ver_2_CS170_Fall_2021_Small_data__86.txt'
+    testLarge = 'CS170/Project2/testdata/Ver_2_CS170_Fall_2021_LARGE_data__27.txt'
 
-#formats the array nicely#
-def printArray(arr = []):       #https://stackoverflow.com/questions/17870612/printing-a-two-dimensional-array-in-python#
-    print('\n'.join([''.join(['{:3}'.format(item) for item in row]) 
-      for row in arr]))
+    #choose which algorithm - assuming no incorrect user input
+    filePick = input('\nPlease select a dataset to run: \n'
+                     '1) Small dataset: Ver_2_CS170_Fall_2021_Small_data__86.txt \n'
+                     '2) Large dataset: Ver_2_CS170_Fall_2021_LARGE_data__27.txt \n'
+                     'Enter choice: ')
+    filePick = int(filePick)
+
+    if(filePick == 1):
+        try:
+            data = open(testSmall, 'r')
+        except:
+            print('File ' + testLarge + ' not found.')
+    else:
+        try:
+            data = open(testLarge, 'r')
+        except:
+            print('File ' + testLarge + ' not found.')
 
     
+    dataInstances = sum(1 for i in data)                #amount of rows in dataset 
+    data.seek(0)                                        #reset data
+    dataFeatures = len(data.readline().split()) - 1     #columns - 1
+    #print message 
+    print('This dataset has ', dataFeatures,
+        ' features (not including the class attribute), with ', dataInstances, '.')
+
 #MAIN DRIVER#
 if __name__ == "__main__":
     menu()
