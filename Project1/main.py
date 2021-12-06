@@ -17,8 +17,8 @@ def menu():
     if userOpt == 1:        #custom puzzle
         print('Lets create your puzzle. Enter one 0 for missing piece. (Program assumes no incorrect input)\n')
         print('Enter the 3x3 puzzle: [example:1 2 3(enter)..etc')
-        for x in range(3):
-            arr.append([int(y) for y in input().split()])
+        for x in range(3):              
+            arr.append([int(y) for y in input().split()])      #https://www.geeksforgeeks.org/input-multiple-values-user-one-line-python/
         print('\nYour puzzle:')
         printArray(arr)
     elif userOpt == 2:                          #preset puzzle
@@ -130,7 +130,6 @@ def left(rowZero, colZero, depth, arr = [], cost = [], visited = []):
 
 def updateQueue(choice, currNode, working_q =[], visited = [], cost = []):
     #loop through list to update cost of node in list
-    
     if choice == 1:  # update depth cost
         for i in range(len(cost)):
             cost[i].depth = currNode.depth+1
@@ -153,10 +152,6 @@ def updateQueue(choice, currNode, working_q =[], visited = [], cost = []):
             cost[i].cost = cost[i].heuristic + cost[i].depth
             heapq.heappush(working_q, cost[i])  # update working queue
             visited.append(cost[i].currState)  # add nodes to visited
-
-        
-        
-        
 
 #Timeout method#
 def timeout(timerStart):
@@ -185,7 +180,7 @@ def generalSearch(arr, choice):
 
     maximum_q+=1                        #add to queue size
     node = Node(arr, heuristic, 0)      #initialize node
-    heapq.heappush(working_q, node)
+    heapq.heappush(working_q, node)     #https://www.geeksforgeeks.org/heap-queue-or-heapq-in-python/
     visited.append(node.currState)      #add node to visited
 
     continueSearch = True           #will be while loop variable
@@ -259,6 +254,7 @@ class Node:
         self.cost = heuristic + depth   # cost = depth g(n) + heuristic h(n)
     
     #need to import these functions in order for heapq to work
+    #https://portingguide.readthedocs.io/en/latest/comparisons.html
     def __eq__(self, other):
         #won't return accurate depth if equal, so return depth
         return (self.depth)
