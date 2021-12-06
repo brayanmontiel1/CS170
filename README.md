@@ -1,2 +1,2 @@
 # CS170
-Project Repo for CS170
+Project repository for CS170 Artificial Intelligence at UCR.
