@@ -1,6 +1,7 @@
 import copy
 import time
 import csv
+import numpy as np
 
 def menu():
     print('Project 2: CS170 Feature Classification - Brayan Montiel\n')
@@ -18,23 +19,25 @@ def menu():
 
     if(filePick == 1):      #small dataset
         try:
-            data = open(testSmall, 'r')
+            data = np.genfromtxt(testSmall)
+            print('You picked: ' + testSmall + ' \n')
         except:
             print('File ' + testLarge + ' not found.')
     else:                   #large dataset
         try:
-            data = open(testLarge, 'r')
+            data = np.genfromtxt(testLarge)
+            print('You picked: ' + testLarge + ' \n')
         except:
             print('File ' + testLarge + ' not found.')
+    dataFeatures = data.shape[1]-1
+    dataInstances = data.shape[0]
+    print('This dataset has', dataFeatures ,' features (not including the class attribute), with ', dataInstances ,' instances.\n')
 
-    
-    dataInstances = sum(1 for i in data)                #amount of rows in dataset 
-    data.seek(0)                                        #reset data
-    dataFeatures = len(data.readline().split()) - 1     #columns - 1
-    #print message 
-    print('This dataset has ', dataFeatures,
-        ' features (not including the class attribute), with ', dataInstances, '.')
-
+    algoPick = input('Type the number of the algorithm you want to run.\n' +
+                        '1) Forward Selection\n' +
+                        '2) Backward Elimination\n')
+    algoPick = int(algoPick)
+    print(algoPick)
 #MAIN DRIVER#
 if __name__ == "__main__":
     menu()
