@@ -6,47 +6,24 @@ from collections import Counter
 def menu():
     print('Project 2: CS170 Feature Classification - Brayan Montiel\n')
 
-    #test data - change when testing assigned small-19 and large-13: 
-    testSmall = 'CS170/Project2/Ver_2_CS170_Fall_2021_Small_data__19.txt'
-    testLarge = 'CS170/Project2/Ver_2_CS170_Fall_2021_LARGE_data__13.txt'
+    #shortcut paths for assigned files 
+    small19 = 'CS170/Project2/Ver_2_CS170_Fall_2021_Small_data__19.txt'
+    large13 = 'CS170/Project2/Ver_2_CS170_Fall_2021_LARGE_data__13.txt'
 
     #choose which dataset to run - assuming no incorrect user input
-    filePick = input('\nPlease select a dataset to run: \n'
-                     '1) Small dataset: Ver_2_CS170_Fall_2021_Small_data__19.txt \n'
-                     '2) Large dataset: Ver_2_CS170_Fall_2021_LARGE_data__13.txt \n'
-                     '3) Type my own text file path \n'
-                     'Enter choice: ')
-    filePick = int(filePick)
-    if(filePick == 1):      #small dataset
-        try:
-            data = panda.genfromtxt(testSmall)
-            print('You picked: ' + testSmall + ' \n')
-        except:
-            print('File ' + testSmall + ' not found.')
-
-    elif(filePick == 2):     #large dataset
-        try:
-            data = panda.genfromtxt(testLarge)
-            print('You picked: ' + testLarge + ' \n')
-        except:
-            print('File ' + testLarge + ' not found.')
-
-    elif(filePick == 3):    #type in file path
-        testCustom = input('Enter file path: ')   #custom file path
-        try:
-            data = panda.genfromtxt(testCustom)
-            print('File ' + testCustom + ' retrieved successfully.\n')
-        except:
-            print('File ' + testCustom + ' not found.')
-
-    dataFeatures = data.shape[1]-1
-    dataInstances = data.shape[0]
-    print('This dataset has', dataFeatures ,' features (not including the class attribute), with ', dataInstances ,' instances.\n')
+    fileName = input('\nType in the name of the file to test : ')
+    
+    data = panda.genfromtxt(fileName)
+    print('You entered: ' + fileName + ' \n')
 
     algoPick = input('Pick the algorithm you want to run.\n' +
                         '1) Forward Selection\n' +
                         '2) Backward Elimination\n')    #assumes no wrong input from user
+    
     algoPick = int(algoPick)
+    dataFeatures = data.shape[1]-1
+    dataInstances = data.shape[0]
+    print('This dataset has', dataFeatures ,' features (not including the class attribute), with ', dataInstances ,' instances.\n')
 
     if(algoPick == 1):           #run forward selection
         print('Okay lets run Forward Selection')        
