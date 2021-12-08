@@ -35,14 +35,29 @@ def menu():
     dataInstances = data.shape[0]
     print('This dataset has', dataFeatures ,' features (not including the class attribute), with ', dataInstances ,' instances.\n')
 
-    algoPick = input('Type the number of the algorithm you want to run.\n' +
+    algoPick = input('Pick the algorithm you want to run.\n' +
                         '1) Forward Selection\n' +
-                        '2) Backward Elimination\n')
+                        '2) Backward Elimination\n')    #assumes no wrong input from user
     algoPick = int(algoPick)
-    print('Okay lets run option #',algoPick)
-    accuracy = leave_one_out_x_valid(data)
-    print('Running nearest neighbor with all ', dataFeatures ,' features, using \"leaving-one-out\" evalutation, I get an accuracy of ',accuracy,'.\n')
-   
+    if(algoPick == 1):                              #run forward selection
+        print('Okay lets run Forward Selection')        
+        accuracy = leave_one_out_x_valid(data)
+        print('Running nearest neighbor with all ', dataFeatures ,' features, using \"leaving-one-out\" evalutation, I get an accuracy of ',accuracy,'.\n')
+        start = time.time()
+        forwardSelection(data)
+        finish = time.time()
+        print('Total run Forward Search runtime: ', (finish-start))
+
+
+    elif(algoPick == 2):                            #run backward selection
+        print('Okay lets run Backward Selection')       
+        accuracy = leave_one_out_x_valid(data)
+        print('Running nearest neighbor with all ', dataFeatures ,' features, using \"leaving-one-out\" evalutation, I get an accuracy of ',accuracy,'.\n')
+        start = time.time()
+        #backwardElimination(data)
+        finish = time.time()
+        print('Total run Forward Search runtime: ', (finish-start))
+
 
 def leave_one_out_x_valid(data):            #performs leave out out validation, gets accuracy
     val = []        #values from nearest neighbors
@@ -93,6 +108,37 @@ def nearestNeighbor(data, current_set, classifications):    #returns nearest nei
     k_dist = list(Counter(k_dist).keys())
     nearest.append(k_dist[0])
     return nearest
+
+
+def forwardSelection(data):
+    dataFeatures = data.shape[1]        #get num of features
+    featBest = []                   #arr with best features   
+    current_set = []                    #arr with current set in data
+    accuracyMax = 0                     #maximum acc to return 
+    for i in range(1,dataFeatures):     #outer loop for i in dataFeatures
+        tempMax = 0
+        featList = []
+        for j in range(i, dataFeatures):    #innter loop for i in dataFeatures
+            if j in current_set:            #skip j in current set
+                continue
+            tempFeatures = current_set + [0] + [j]
+            tempAccuracy = leave_one_out_x_valid(data[:,tempFeatures])
+            print('Using feature(s) ',current_set+[j] ,' accuracy is ', tempAccuracy)
+
+            if(max(tempAccuracy, tempMax) == tempAccuracy):
+                tempMax = tempAccuracy      #assign max to current max accuracy 
+                featList = j
+
+        if featList:    #if not 0
+            current_set.append(featList)
+            if(max(accuracyMax, tempMax) == tempMax):  #check max btw tempMax and overall accuracy 
+                accuracyMax = tempMax
+                featBest[:] = current_set
+                print('Feature set {', current_set,'} was best, accuracy is ', tempMax)
+            else:
+                print('Feature set {', current_set,'} was best, accuracy is ', tempMax)
+    print('Finished search! The best feature subset is ', featBest,', which has an accuracy of ', accuracyMax, '%.' )
+
 
 if __name__ == "__main__":
     menu()
