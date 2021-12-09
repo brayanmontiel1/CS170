@@ -7,8 +7,8 @@ def menu():
     print('Project 2: CS170 Feature Classification - Brayan Montiel\n')
 
     #shortcut paths for assigned files 
-    small19 = 'CS170/Project2/Ver_2_CS170_Fall_2021_Small_data__19.txt'
-    large13 = 'CS170/Project2/Ver_2_CS170_Fall_2021_LARGE_data__13.txt'
+    small19 = './Ver_2_CS170_Fall_2021_Small_data__19.txt'
+    large13 = './Ver_2_CS170_Fall_2021_LARGE_data__13.txt'
 
     #choose which dataset to run - assuming no incorrect user input
     fileName = input('\nType in the name of the file to test : ')
