@@ -102,36 +102,6 @@ def dist(i,data):
         total += num
     return (total**(1/2))       
 
-def forwardSelection(data):
-    dataFeatures = data.shape[1]        #get num of features
-    featBest = []                   #arr with best features   
-    current_set = []                    #arr with current set in data
-    accuracyMax = 0                     #maximum acc to return 
-    for i in range(1,dataFeatures):     #outer loop for i in dataFeatures
-        tempMax = 0
-        featList = []
-        for j in range(i, dataFeatures):    #innter loop for i in dataFeatures
-            if j in current_set:            #skip j in current set
-                continue
-            tempFeatures = [0] + current_set + [j]
-            tempAccuracy = leave_one_out_x_valid(data[:,tempFeatures])
-            print('\tUsing feature(s) ',current_set+[j] ,' accuracy is ', round(tempAccuracy,2), '%.' )
-
-            if(tempMax < tempAccuracy):
-                featList = j
-                tempMax = tempAccuracy      #assign max to current max accuracy 
-
-        if featList:    #if not 0
-            current_set.append(featList)
-            if(accuracyMax < tempMax):  #check max btw tempMax and overall accuracy 
-                accuracyMax = tempMax
-                featBest[:] = current_set
-                print('Feature set ', current_set,' was best, accuracy is ', round(tempMax,2), '%.' )
-            else:
-                print('Feature set ', current_set,' was best, accuracy is ', round(tempMax,2), '%.' )
-    print('\nFinished search! The best feature subset is ', featBest,', which has an accuracy of ', round(accuracyMax,2), '%.')
-
-
 def backwardElimination(data):          #backwards logic of forward selection
     dataFeatures = data.shape[1]        #get num of features
     featBest = list(range(1,dataFeatures))      #arr with best features   
@@ -154,6 +124,35 @@ def backwardElimination(data):          #backwards logic of forward selection
 
         if featList:    #if not 0
             current_set = [k for k in current_set if k != featList]
+            if(accuracyMax < tempMax):  #check max btw tempMax and overall accuracy 
+                accuracyMax = tempMax
+                featBest[:] = current_set
+                print('Feature set ', current_set,' was best, accuracy is ', round(tempMax,2), '%.' )
+            else:
+                print('Feature set ', current_set,' was best, accuracy is ', round(tempMax,2), '%.' )
+    print('\nFinished search! The best feature subset is ', featBest,', which has an accuracy of ', round(accuracyMax,2), '%.')
+
+def forwardSelection(data):
+    dataFeatures = data.shape[1]        #get num of features
+    featBest = []                   #arr with best features   
+    current_set = []                    #arr with current set in data
+    accuracyMax = 0                     #maximum acc to return 
+    for i in range(1,dataFeatures):     #outer loop for i in dataFeatures
+        tempMax = 0
+        featList = []
+        for j in range(i, dataFeatures):    #innter loop for i in dataFeatures
+            if j in current_set:            #skip j in current set
+                continue
+            tempFeatures = [0] + current_set + [j]
+            tempAccuracy = leave_one_out_x_valid(data[:,tempFeatures])
+            print('\tUsing feature(s) ',current_set+[j] ,' accuracy is ', round(tempAccuracy,2), '%.' )
+
+            if(tempMax < tempAccuracy):
+                featList = j
+                tempMax = tempAccuracy      #assign max to current max accuracy 
+
+        if featList:    #if not 0
+            current_set.append(featList)
             if(accuracyMax < tempMax):  #check max btw tempMax and overall accuracy 
                 accuracyMax = tempMax
                 featBest[:] = current_set
